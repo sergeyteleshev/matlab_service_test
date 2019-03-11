@@ -339,7 +339,7 @@ global gl_Q
 gl_U=U_condition;
 gl_Q=Q_amount;
 
-testModelSystem(A,S,Pr)
+%testModelSystem(A,S,Pr)
 
 
 
@@ -492,8 +492,8 @@ if(visualize == true)
         else                    %устройство свободно
             set(handles.edit9, 'BackgroundColor', [1.0 1.0 1.0]);
         end
-        pause(0.1);
-    end
+        pause(0.3);
+   end   
 end
  
 
