@@ -12,33 +12,30 @@ function [] = testModelSystem(A,S,Pr)
          
     %пока не кончился пул заявок
     while(~isempty(A))
-        T_min = max([A,S]);
+        T_min = max([A,S, devices_time]);
         
-        min_time_A = max(A);
+        if(min(devices_time) <= T_min && min(devices_time) > 0)
+            T_min = min(devices_time);
+        end
         
-        %если это первый элемент и в очереди и на девайсах пусто
-        if(length(A) == N)
-            for j=1:1:length(A)
-                if(A(j) <= min_time_A && A(j) > 0)
-                    min_time_A = A(j);                
-                end
+        min_time_A = max(A(A>0));
+        min_time_S = max(S(S>0));
+        min_time_device = min(devices_time(devices_time>0));
+                       
+        for j=1:1:length(A)
+            if(A(j) <= min_time_A && A(j) > 0)
+                min_time_A = A(j);                
             end
+        end
 
-            T_A(end+1) = min_time_A;
+        %T_A(end+1) = min_time_A;
 
-            for j=1:1:length(A)
-                if(A(j) >= min_time_A)
-                    A(j) = A(j) - min_time_A;
-                end
+        for j=1:1:length(A)
+            if(A(j) >= min_time_A)
+                A(j) = A(j) - min_time_A;
             end
-        else
-            for j=1:1:length(A)
-                if(A(j) <= T_min && A(j) > 0)
-                    T_min = A(j);                
-                end
-            end
-        end        
-                                 
+        end
+                                         
         elements_to_queue_number = find(A==0);   
         
         %не учитывает, что может быть одинаковое время до прибытия заявки.
@@ -60,18 +57,17 @@ function [] = testModelSystem(A,S,Pr)
                 %упорядочивание приоритетов по мере их значимости. в конце
                 %самые крутые
                                 
-                [queue, queue_device_time] = sortQueue(queue,queue_device_time);                   
-                queue
+                [queue, queue_device_time] = sortQueue(queue,queue_device_time);                                   
                 
                 free_devices_index = find(devices==0); 
                 elements_in_queue_for_devices = find(queue~=0);                
                 
-                if(~isempty(free_devices_index) && ~isempty(elements_in_queue_for_devices))
+                while(~isempty(free_devices_index) && ~isempty(elements_in_queue_for_devices))
                     %если устройства свободны, то загружаем из очереди наши
                     %заявки
                     min_time_devices = max(S);
                     
-                    while(length(free_devices_index) >= length(elements_in_queue_for_devices))                                                                        
+                    if(length(free_devices_index) >= length(elements_in_queue_for_devices))                                                                        
                         for o=1:1:length(elements_in_queue_for_devices)
                             devices(free_devices_index(o)) = queue(elements_in_queue_for_devices(o));                            
                             devices_time(free_devices_index(o)) = queue_device_time(elements_in_queue_for_devices(o));  
@@ -92,66 +88,31 @@ function [] = testModelSystem(A,S,Pr)
                     %заполнение девайсов заявками и временем обработки заявки
                     for z=1:1:length(devices)                        
                         %минимум для дальнейшего вычитания времени из всех девайсов.
-                        %экономия, короче    
+                        %экономия, короче                            
                         
-                        if(length(A) == N)
-                            if(devices_time(z) > 0 && devices_time(z) <= min_time_devices)                
-                                min_time_devices = devices_time(z);
-                            end
-                        else
-                            if(devices_time(z) > 0 && devices_time(z) <= T_min)                                                
-                                T_min = devices_time(z);
-                            end                       
-                        end                                                                        
+                        if(devices_time(z) > 0 && devices_time(z) <= min_time_devices)                
+                            min_time_devices = devices_time(z);
+                        end                                                                                        
                     end                         
 
                     T_devices(end+1) = min_time_devices;  
                     
                     %если это на девайсах и в очереди уже есть заявки то
-                    %отнимаем общее время у всех
-                    if(length(A) ~= N)
-                        for j=1:1:length(A)
-                            if(A(j) <= T_min && A(j) > 0)
-                                T_min = A(j);                
-                            end
+                    %отнимаем общее время у всех                    
+                    for z=1:1:length(devices)                            
+                        if(devices_time(z) >= min_time_devices)
+                            devices_time(z) = devices_time(z) - min_time_devices;
+                        end                                                
+
+                        %заявка обработана. при следующей итерации, утройство займёт
+                        %другая заявка
+                        if(devices_time(z) == 0 && devices(z) ~= 0)
+                            devices(z) = 0;
+                            Ns = Ns + 1;
                         end
-
-                        T_A(end+1) = T_min;
-
-                        for j=1:1:length(A)
-                            if(A(j) >= T_min)
-                                A(j) = A(j) - T_min;
-                            end
-                        end
-                                                                                       
-                        for z=1:1:length(devices)
-                            if(devices_time(z) >= T_min)
-                                devices_time(z) = devices_time(z) - T_min;
-                            end                                                
-
-                            %заявка обработана. при следующей итерации, утройство займёт
-                            %другая заявка
-                            if(devices_time(z) == 0 && devices(z) ~= 0)
-                                devices(z) = 0;
-                                Ns = Ns + 1;
-                            end
-                        end                                          
-                    else
-                        for z=1:1:length(devices)                            
-                            if(devices_time(z) >= min_time_devices)
-                                devices_time(z) = devices_time(z) - min_time_devices;
-                            end                                                
-
-                            %заявка обработана. при следующей итерации, утройство займёт
-                            %другая заявка
-                            if(devices_time(z) == 0 && devices(z) ~= 0)
-                                devices(z) = 0;
-                                Ns = Ns + 1;
-                            end
-                        end  
-                    end
+                    end                      
                                         
-                    T(end+1) = T_min
+                    T(end+1) = T_min;
                     
                     free_devices_index = find(devices==0);
                     elements_in_queue_for_devices = find(queue~=0);       

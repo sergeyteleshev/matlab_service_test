@@ -339,7 +339,7 @@ global gl_Q
 gl_U=U_condition;
 gl_Q=Q_amount;
 
-%testModelSystem(A,S,Pr)
+huy(A,S,Pr);
 
 
 

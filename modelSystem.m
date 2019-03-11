@@ -33,8 +33,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     d=[];                      %Время пребывания каждой заявки в очереди
     
     
-    n=length(A);               %Общее число поступивших в систему требований
-    fail=0;                    %Количество отказов
+    n=length(A);               %Общее число поступивших в систему требований   
     Ns=0;                      %Число прошедших заявок
     
     Q_amount=[0];              %Массив чисел требований в очереди - необходим для графика
@@ -56,7 +55,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         %
         %
         % Нахождение максимального элемента среди двух сгенерированных массивов
-        S_MIN = max([A,S])+1;
+        S_MIN = max([A,S])+1;        
 
         % Если какое-то из устройств занято...
         if ~isempty(U(U>0))
@@ -66,14 +65,11 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         %Сравнение S_MIN и времени поступления новой заявки
         
         
-        if S_MIN < A(i)  %Следующее событие - выполнение имеющейся заявки
-            
+        if S_MIN < A(i)  %Следующее событие - выполнение имеющейся заявки                        
             
             %Изменение текущего времени
             Int(end+1)=S_MIN;
-            T(end+1)=T(end)+S_MIN;
-            
-            
+            T(end+1)=T(end)+S_MIN;                        
             
             %Измение времени появления следующей заявки
             A(i)=A(i)-S_MIN;
@@ -97,21 +93,20 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                      p(k)=p(k)+S_MIN;
                  end
             end
-            %disp(sprintf('Заявка выполнена на устройстве %g', j(1)));
+            %disp(sprintf('Заявка выполнена на устройстве %g', j(1)));                        
             
             %Изменение числа требований в системе - число уменьшается:
             S_amount(end+1) = S_amount(end)-1;
             
             %Проверка очереди
             %Если очередь не пуста - добавление заявки на освободившееся
-            %устройство
+            %устройство                        
             if ~isempty(Q)
                 U(j(1))=Q(1);
                 
                 U_priority(j(1))=Q_priority(1);
                 %disp(sprintf('Заявка из очереди перемещена на устройство %g',j(1)));
-                
-                
+                                
                 %Очистка очереди
                 Q = Q(2:length(Q));
                 Q_priority= Q_priority(2:length(Q_priority));
@@ -173,7 +168,8 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                 Ns=Ns+1;                
             else
                 %нет свободного устройства. пройдись по циклу ещё раз и
-                %поменяй время                
+                %поменяй время                                
+                
                 continue;
             end
                                 
@@ -203,7 +199,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         
         %Изменение модельного времени
         Int(length(Int)+1)=S_MIN;
-        T(length(T)+1)=T(length(T))+S_MIN;
+        T(length(T)+1)=T(length(T))+S_MIN;               
         
         %Изменение статистики d
         for k = 1:1:length(Q_current)
@@ -214,15 +210,15 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         j = find(U==min(U(U>0)));
             
         %Обнуление приоритета
-        U_priority(j(1))=0;
+        U_priority(j(1))=0;        
 
         %Изменение времени на всех устройствах
         for k = 1:1:length(U)
-                 if U(k)>0 & (length(Int)>1)
-                     U(k)=U(k)-Int(length(Int));
-                     %Сбор статистики p
-                     p(k)=p(k)+Int(length(Int));
-                 end
+             if U(k)>0 && (length(Int)>1)
+                 U(k)=U(k)-Int(length(Int));
+                 %Сбор статистики p
+                 p(k)=p(k)+Int(length(Int));
+             end
         end
         
         %disp(sprintf('Заявка выполнена на устройстве %g', j(1)));
@@ -234,18 +230,16 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         %Если очередь не пуста - добавление заявки на освободившееся
         %устройство
         if ~isempty(Q)
-            U(j(1))=Q(1);
+            U(j(1))=Q(1);            
                 
             U_priority(j(1))=Q_priority(1);
             
-            %disp(sprintf('Заявка из очереди перемещена на устройство %g',j(1)));
-                
-
+            %disp(sprintf('Заявка из очереди перемещена на устройство %g',j(1)));                
                 
             %Очистка очереди
             Q = Q(2:length(Q));
             Q_current = Q_current(2:length(Q_current));
-            Q_priority= Q_priority(2:length(Q_priority));
+            Q_priority= Q_priority(2:length(Q_priority));            
             
             %Изменение числа требований в очереди - число уменьшается
             Q_amount(end+1) = Q_amount(end)-1;            
@@ -323,9 +317,5 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     g_n = n;
     g_sn = sn;
     g_p_current = p_current;
-    visualize = true;
-end
-
-     
-     
-      
+    visualize = true;        
+end   
