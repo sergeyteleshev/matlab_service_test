@@ -117,6 +117,8 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                 Q = Q(2:length(Q));
                 Q_priority= Q_priority(2:length(Q_priority));
                 Q_current = Q_current(2:length(Q_current));
+               
+                [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);
                 
                 %»зменение числа требований в очереди - число уменьшаетс€
                 Q_amount(end+1) = Q_amount(end)-1;
@@ -176,23 +178,23 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
             else
                 %disp('Ќет свободного устройства')
                 if length(Q) < queue_max %ѕроверка очереди
-
+                    
                     %¬ытеснение за€вки в очередь(ƒобавление в начало)
-                    Q=[U(k(1)),Q];
+                    Q=[S(i),Q];
                     Q_current=[i,Q_current];
-                    Q_priority=[U_priority(k(1)),Q_priority];
+                    Q_priority=[Pr(i),Q_priority];
                     %disp(sprintf('«а€вка c более низким приоритетом перемещена в очередь. ќсталось мест в очереди: %g', queue_max-length(Q)))
 
 
                     %ƒобавление важной за€вки на устройство
-                    U(k(1))=S(i);
-                    U_priority(k(1))=Pr(i);
+                    %U(k(1))=S(i);
+                    %U_priority(k(1))=Pr(i);
 
                     %—бор статистики d - добавление нового элемента в массив
                     d(i)=0;
 
                     %»зменение числа требований в системе - число увеличиваетс€:
-                    S_amount(end+1) = S_amount(end)+1;
+                    S_amount(end+1) = S_amount(end);
 
                     %»зменение числа требований в очереди - число увеличиваетс€:
                     Q_amount(end+1) = Q_amount(end)+1;
@@ -202,8 +204,8 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
 
                     %ƒобавление важной за€вки на устройство
 
-                    U(k(1))=S(i);
-                    U_priority(k(1))=Pr(i);
+                    %U(k(1))=S(i);
+                    %U_priority(k(1))=Pr(i);
 
                     %—бор статистики fail - количество отказов
                     fail=fail+1;
@@ -295,6 +297,8 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
             Q = Q(2:length(Q));
             Q_current = Q_current(2:length(Q_current));
             Q_priority= Q_priority(2:length(Q_priority));
+            
+            [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);
             
             %»зменение числа требований в очереди - число уменьшаетс€
             Q_amount(end+1) = Q_amount(end)-1;
