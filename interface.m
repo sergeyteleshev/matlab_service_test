@@ -339,8 +339,6 @@ global gl_Q
 gl_U=U_condition;
 gl_Q=Q_amount;
 
-huy(A,S,Pr);
-
 
 
 function edit6_Callback(hObject, eventdata, handles)
