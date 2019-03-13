@@ -439,12 +439,17 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global gl_U;
 global gl_Q visualize;
+count_brown = 0;
+count_blue = 0;
+count_gray = 0;
+count_gold =0;
 if(visualize == true)
    for i=1:1:length(gl_U)
-        set(handles.text25, 'String', gl_Q(i));
+        set(handles.text25, 'String', gl_Q(i));        
 
         if gl_U(i, 1)==1       %низкий приоритет
             %коричневый
+            count_brown = count_brown +1;
             set(handles.edit6, 'BackgroundColor', [0.6 0.2 0.0]);
         elseif gl_U(i, 1)==2   %приоритет=2
             %синий
@@ -460,6 +465,7 @@ if(visualize == true)
         end
 
         if gl_U(i, 2)==1       %низкий приоритет
+            count_brown = count_brown + 1;
             set(handles.edit7, 'BackgroundColor', [0.6 0.2 0.0]);
         elseif gl_U(i, 2)==2   %приоритет=2
             set(handles.edit7, 'BackgroundColor', [0.078 0.169 0.549]);
@@ -472,6 +478,7 @@ if(visualize == true)
         end
 
         if gl_U(i, 3)==1       %низкий приоритет
+            count_brown = count_brown + 1;
             set(handles.edit8, 'BackgroundColor', [0.6 0.2 0.0]);
         elseif gl_U(i, 3)==2   %приоритет=2
             set(handles.edit8, 'BackgroundColor', [0.078 0.169 0.549]);
@@ -484,6 +491,7 @@ if(visualize == true)
         end
 
         if gl_U(i, 4)==1       %низкий приоритет
+            count_brown = count_brown + 1;
             set(handles.edit9, 'BackgroundColor', [0.6 0.2 0.0]);
         elseif gl_U(i, 4)==2   %приоритет=2
             set(handles.edit9, 'BackgroundColor', [0.078 0.169 0.549]);
@@ -494,8 +502,8 @@ if(visualize == true)
         else                    %устройство свободно
             set(handles.edit9, 'BackgroundColor', [1.0 1.0 1.0]);
         end
-        pause(0.4);
-   end   
+        pause(0.3);
+   end  
 end
  
 

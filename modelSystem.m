@@ -325,7 +325,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     disp('=======================================');
     
     
-    up=p/(T(end));%Относительная занятость устройств
+    up=p/(T(end));                                                   %Относительная занятость устройств
     factor_p = sum(up)/length(up);                                   %Коэффициент использования системы
     factor_Tq = sum(d)/length(d);                                    %Среднее время ожидания завки в очереди
     factor_Ts = sum(d+S(1:length(d)))/length(d);                     %Среднее время пребывания завки в системе
