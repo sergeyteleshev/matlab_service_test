@@ -15,8 +15,7 @@ function [ Prt_X ] = priority_generator( X_start, N)
     P_X2=0.3;
     
     %Вероятность появления X3
-    P_X3=0.2;
-    
+    P_X3=0.2;    
     
     X_current = X_start;
     

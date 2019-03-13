@@ -17,7 +17,7 @@
 %queue_max - длина очереди
 
 
-function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr, T, U_condition, Q_amount] = run(A, S, Pr, device_number, queue_max)
+function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr, T, U_condition, Q_amount] = modelSystem(A, S, Pr, device_number, queue_max)
 
     
     %Инициализация переменных
@@ -118,7 +118,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                 Q_priority= Q_priority(2:length(Q_priority));
                 Q_current = Q_current(2:length(Q_current));
                
-                [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);
+                [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);                
                 
                 %Изменение числа требований в очереди - число уменьшается
                 Q_amount(end+1) = Q_amount(end)-1;
@@ -290,8 +290,6 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
             U_priority(j(1))=Q_priority(1);
             
             %disp(sprintf('Заявка из очереди перемещена на устройство %g',j(1)));
-                
-
                 
             %Очистка очереди
             Q = Q(2:length(Q));

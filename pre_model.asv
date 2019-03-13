@@ -1,0 +1,9 @@
+nRuns = 30;
+nFeatures = 7;
+
+global N mean_arrive mean_service queue_limit device_amount t;
+
+
+for i=1:1:n
+    [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr, T, U_condition, Q_amount] = modelSystem(A, S, Pr, device_number, queue_max);
+end
