@@ -1,9 +1,8 @@
-global N mean_arrive mean_service queue_limit device_amount;
+arguments
+global N mean_arrive mean_service queue_limit device_amount runsFileName nFeatures;
 nRuns = 50;
-nFeatures = 7;
 statistic = zeros(1, nFeatures);
-sheetList = 1;
-runsFileName = 'pre_model.xlsx';
+runsFileSheet = 1;
 
 for i=1:1:nRuns
     P_start=rem((X_start_generator()+1000),1000);
@@ -40,7 +39,7 @@ end
 n_max = ceil(max(n_stat))
 
 headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
-xlswrite(runsFileName,headers, sheetList, 'A1:G1');
-xlswrite(runsFileName,statistic, sheetList, 'A2');
-xlswrite(runsFileName,"n", sheetList, 'I1');
-xlswrite(runsFileName,n_max, sheetList, 'I2');
+xlswrite(runsFileName,headers, runsFileSheet, 'A1:G1');
+xlswrite(runsFileName,statistic, runsFileSheet, 'A2');
+xlswrite(runsFileName,"n", runsFileSheet, 'I1');
+xlswrite(runsFileName,n_max, runsFileSheet, 'I2');

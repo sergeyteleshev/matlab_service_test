@@ -1,4 +1,4 @@
-global N mean_arrive mean_service queue_limit device_amount t runsFileName factorPlanFileName nFeatures;
+global N mean_arrive mean_service queue_limit device_amount t runsFileName factorPlanFileName;
 N = 1000;
 mean_arrive = 20;
 mean_service = 60;
