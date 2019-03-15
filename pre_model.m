@@ -1,9 +1,9 @@
-nRuns = 30;
-nFeatures = 7;
-
-stats = zeros(1, nFeatures);
-
 global N mean_arrive mean_service queue_limit device_amount;
+nRuns = 50;
+nFeatures = 7;
+statistic = zeros(1, nFeatures);
+sheetList = 1;
+runsFileName = 'pre_model.xlsx';
 
 for i=1:1:nRuns
     P_start=rem((X_start_generator()+1000),1000);
@@ -17,13 +17,30 @@ for i=1:1:nRuns
 
     [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr, T, U_condition, Q_amount] = modelSystem(A, S, Pr, device_amount, queue_limit);
     
-    stats(i,1) = factor_p;
-    stats(i,2) = factor_Tq;
-    stats(i,3) = factor_Ts;
-    stats(i,4) = factor_Nq;
-    stats(i,5) = factor_Ns;
-    stats(i,6) = factor_Ca;
-    stats(i,7) = factor_Cr;
+    statistic(i, 1) = factor_p;
+    statistic(i, 2) = factor_Tq; 
+    statistic(i, 3) = factor_Ts;
+    statistic(i, 4) = factor_Nq;
+    statistic(i, 5) = factor_Ns;
+    statistic(i, 6) = factor_Ca;
+    statistic(i, 7) = factor_Cr;   
 end
 
-stats
+mean_stat = zeros(1, nFeatures);
+var_stat = zeros(1, nFeatures);
+n_stat = zeros(1, nFeatures);
+
+for i=1:1:nFeatures    
+    mean_stat(i) = average(statistic(:,i));
+    var_stat(i) = dispersion(statistic(:,i));
+    epsilon = 0.05 * mean_stat(i);
+    n_stat(i) = (1.96 ^ 2 * var_stat(i)) / epsilon ^ 2;
+end
+
+n_max = ceil(max(n_stat))
+
+headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
+xlswrite(runsFileName,headers, sheetList, 'A1:G1');
+xlswrite(runsFileName,statistic, sheetList, 'A2');
+xlswrite(runsFileName,"n", sheetList, 'I1');
+xlswrite(runsFileName,n_max, sheetList, 'I2');
