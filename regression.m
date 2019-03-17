@@ -1,32 +1,41 @@
 arguments
-global factorPlanFileName nFeatures regressionPlanFileName;
+global factorPlanFileName device_amount queue_limit mean_service regressionFileName;
 
 factorPlanResult = xlsread(factorPlanFileName, 1, "A2:G9");
+device_amount_dif = 2;
+queue_limit_dif = 5;
+mean_service_dif = 10;
+%столбец 1 = девайсы ; столбец 2 = очередь; столбец 3 = время обслуживания
+x1max = device_amount + device_amount_dif;
+x1min = device_amount - device_amount_dif;
 
-e1 = zeros(1, nFeatures);
-e2 = zeros(1, nFeatures);
-e3 = zeros(1, nFeatures);
-e12 = zeros(1, nFeatures);
-e13 = zeros(1, nFeatures);
-e23 = zeros(1, nFeatures);
+x2max = queue_limit + queue_limit_dif;
+x2min = queue_limit - queue_limit_dif;    
 
-for i=1:1:nFeatures
-    currentFactor = factorPlanResult(:, i);
-    e1(i) = (currentFactor(2) - currentFactor(1) + currentFactor(4) - currentFactor(3) + currentFactor(6) - currentFactor(5) + currentFactor(8) - currentFactor(7)) / 4;
-    e2(i) = (currentFactor(3) - currentFactor(1) + currentFactor(4) - currentFactor(2) + currentFactor(7) - currentFactor(5) + currentFactor(8) - currentFactor(6)) / 4;
-    e3(i) = (currentFactor(5) - currentFactor(1) + currentFactor(6) - currentFactor(2) + currentFactor(7) - currentFactor(3) + currentFactor(8) - currentFactor(4)) / 4;
+x3max = mean_service + mean_service_dif;
+x3min = mean_service - mean_service_dif;
+
+answer = [];
+
+for i=1:1:length(factorPlanResult(1, :))
+    b = factorPlanResult(:, i);
+                   
+    A = [
+        1 x1min x2min x3min x1min*x2min x1min*x3min x2min*x3min x1min*x2min*x3min;
+        1 x1max x2min x3min x1max*x2min x1max*x3min x2min*x3min x1max*x2min*x3min;
+        1 x1min x2max x3min x1min*x2max x1min*x3min x2max*x3min x1min*x2max*x3min;
+        1 x1max x2max x3min x1max*x2max x1max*x3min x2max*x3min x1max*x2max*x3min;
+        1 x1min x2min x3max x1min*x2min x1min*x3max x2min*x3max x1min*x2min*x3max;
+        1 x1max x2min x3max x1max*x2min x1max*x3max x2min*x3max x1max*x2min*x3max;
+        1 x1min x2max x3max x1min*x2max x1min*x3max x2max*x3max x1min*x2max*x3max;
+        1 x1max x2max x3max x1max*x2max x1max*x3max x2max*x3max x1max*x2max*x3max;
+    ];
     
-    e12(i) = (currentFactor(4) - currentFactor(3) + currentFactor(8) - currentFactor(7) / 4) - ((currentFactor(2) - currentFactor(1) + currentFactor(6) - currentFactor(5)) / 4);
-    e13(i) = (currentFactor(6) - currentFactor(5) + currentFactor(8) - currentFactor(7) / 4) - ((currentFactor(2) - currentFactor(1) + currentFactor(4) - currentFactor(3)) / 4);
-    e23(i) = (currentFactor(7) - currentFactor(5) + currentFactor(8) - currentFactor(6) / 4) - ((currentFactor(3) - currentFactor(1) + currentFactor(4) - currentFactor(2)) / 4);
-    
-    e123(i) = ((currentFactor(8) - currentFactor(7) - currentFactor(6) + currentFactor(5) / 4)) - ((currentFactor(4) - currentFactor(3) - currentFactor(2) + currentFactor(1)) / 4);
+    answer = [answer A\b]; 
 end
 
-factor_headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
-e_headers = ["e1"; "e2"; "e3"; "e12"; "e13"; "e23"; "e123"];
-e = [e1; e2; e3; e12; e13; e23; e123];
+answer
 
-xlswrite(regressionPlanFileName, e_headers, 1, "A2:A8"); 
-xlswrite(regressionPlanFileName, factor_headers, 1, "B1:H1");
-xlswrite(regressionPlanFileName, e, 1, "B2:H8");
+headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
+xlswrite(regressionFileName,headers, 1, 'A1:G1');
+xlswrite(regressionFileName,answer, 1, 'A2:G9');

@@ -23,9 +23,8 @@ plan = [
     '+','+','+' ;
 ];
 
-length(plan(1, :)) %3
-length(plan(:,1)) %8
-
+%length(plan(1, :)) %3
+%length(plan(:,1)) %8
 
 for i=1:1:length(plan(:, 1))
     current_device_amount = device_amount;
