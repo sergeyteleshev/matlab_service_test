@@ -194,7 +194,7 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                     d(i)=0;
 
                     %Изменение числа требований в системе - число увеличивается:
-                    S_amount(end+1) = S_amount(end);
+                    S_amount(end+1) = S_amount(end)+1;
 
                     %Изменение числа требований в очереди - число увеличивается:
                     Q_amount(end+1) = Q_amount(end)+1;

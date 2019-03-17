@@ -32,7 +32,7 @@ T=2.5*10^7;
 
 y = zeros(length(a(1,:)), length(a(:,1))-1);
 
-for i=1:1:7
+for i=1:1:length(a(:,1))-1
     y(1,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2min + a(4,i)*x3min + a(5,i)*x1min*x2min + a(6,i)*x1min*x3min + a(7,i)*x2min*x3min + a(8,i)*x1min*x2min*x3min;
     y(2,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2min + a(4,i)*x3min + a(5,i)*x1max*x2min + a(6,i)*x1max*x3min + a(7,i)*x2min*x3min + a(8,i)*x1max*x2min*x3min;
     y(3,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2max + a(4,i)*x3min + a(5,i)*x1min*x2max + a(6,i)*x1min*x3min + a(7,i)*x2max*x3min + a(8,i)*x1min*x2max*x3min;
@@ -52,8 +52,6 @@ I=[];
 for k=1:1:8    
     I(k)=EH*c1*s(k)+c2*(Ns(k)-Nq(k))+c3*(s(k)-Ns(k)+Nq(k))+ c4*T*(1/m_A-Ca(k))+c5*T*Nq(k);
 end
-
-I'
 
 P_start=rem((X_start_generator()+1000),1000);
 A_start=X_start_generator();

@@ -130,7 +130,7 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
  %Число требований в системе
- global g_Sn g_T;
+ global g_Sn g_T; 
  figure('Name', '2');plot (g_T, g_Sn, 'r', 'LineWidth', 1);title('Число требований в системе'); xlabel('Модельное время T, с'); ylabel('Количество требований, шт');
 
 
