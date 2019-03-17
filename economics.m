@@ -1,13 +1,24 @@
 arguments;
-global mean_arrive factorPlanFileName device_amount mean_service N queue_limit;
+global mean_arrive factorPlanFileName device_amount mean_service N queue_limit regressionFileName economicsFileName;
 
 device_amount_dif = 2;
-device_min = device_amount - device_amount_dif;
-device_max = device_amount + device_amount_dif;
+queue_limit_dif = 5;
+mean_service_dif = 10;
 
-s=[device_min device_max device_min device_max device_min device_max device_min device_max];
+%столбец 1 = девайсы ; столбец 2 = очередь; столбец 3 = время обслуживания
+x1max = device_amount + device_amount_dif;
+x1min = device_amount - device_amount_dif;
+
+x2max = queue_limit + queue_limit_dif;
+x2min = queue_limit - queue_limit_dif;    
+
+x3max = mean_service + mean_service_dif;
+x3min = mean_service - mean_service_dif;
+
+s=[x1min x1max x1min x1max x1min x1max x1min x1max];
 m_A = mean_arrive;
 factorPlanResult = xlsread(factorPlanFileName, 1, "A2:G9");
+a = xlsread(regressionFileName, 1, "A2:G9")
 
 EH=0.15;
 
@@ -19,9 +30,22 @@ c5=0.094;
 
 T=2.5*10^7;
 
-Nq=factorPlanResult(:, 4); 
-Ns=factorPlanResult(:, 5);
-Ca=factorPlanResult(:, 6);
+y = zeros(length(a(1,:)), length(a(:,1))-1);
+
+for i=1:1:7
+    y(1,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2min + a(4,i)*x3min + a(5,i)*x1min*x2min + a(6,i)*x1min*x3min + a(7,i)*x2min*x3min + a(8,i)*x1min*x2min*x3min;
+    y(2,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2min + a(4,i)*x3min + a(5,i)*x1max*x2min + a(6,i)*x1max*x3min + a(7,i)*x2min*x3min + a(8,i)*x1max*x2min*x3min;
+    y(3,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2max + a(4,i)*x3min + a(5,i)*x1min*x2max + a(6,i)*x1min*x3min + a(7,i)*x2max*x3min + a(8,i)*x1min*x2max*x3min;
+    y(4,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2max + a(4,i)*x3min + a(5,i)*x1max*x2max + a(6,i)*x1max*x3min + a(7,i)*x2max*x3min + a(8,i)*x1max*x2max*x3min;
+    y(5,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2min + a(4,i)*x3max + a(5,i)*x1min*x2min + a(6,i)*x1min*x3max + a(7,i)*x2min*x3max + a(8,i)*x1min*x2min*x3max;
+    y(6,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2min + a(4,i)*x3max + a(5,i)*x1max*x2min + a(6,i)*x1max*x3max + a(7,i)*x2min*x3max + a(8,i)*x1max*x2min*x3max;
+    y(7,i) = a(1,i) + a(2,i)*x1min + a(3,i)*x2max + a(4,i)*x3max + a(5,i)*x1min*x2max + a(6,i)*x1min*x3max + a(7,i)*x2max*x3max + a(8,i)*x1min*x2max*x3max;
+    y(8,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2max + a(4,i)*x3max + a(5,i)*x1max*x2max + a(6,i)*x1max*x3max + a(7,i)*x2max*x3max + a(8,i)*x1max*x2max*x3max;
+end
+
+Nq=y(:, 4); 
+Ns=y(:, 5);
+Ca=y(:, 6);
 
 I=[];
 
@@ -44,8 +68,11 @@ Pr=priority_generator(P_start, N);
 
 Ist=EH*c1*device_amount+c2*(factor_Ns-factor_Nq)+c3*(device_amount-factor_Ns+factor_Nq)+ c4*T*(1/m_A-factor_Ca)+c5*T*factor_Nq;
 
-xlswrite(factorPlanFileName ,"I", 1, 'I1');
-xlswrite(factorPlanFileName ,I', 1, 'I2:I9');
-xlswrite(factorPlanFileName ,[factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr], 1, 'A11:G11');
+headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
+xlswrite(economicsFileName,headers, 1, 'A1:G1');
+xlswrite(economicsFileName,"I", 1, 'I1');
+xlswrite(economicsFileName, y, 1, 'A2');
+xlswrite(economicsFileName ,I', 1, 'I2:I9');
+xlswrite(economicsFileName ,[factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, factor_Cr], 1, 'A11:G11');
 
-xlswrite(factorPlanFileName ,Ist, 1, 'I11:I11');
+xlswrite(economicsFileName ,Ist, 1, 'I11:I11');

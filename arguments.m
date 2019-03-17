@@ -1,4 +1,4 @@
-global N mean_arrive mean_service queue_limit device_amount t runsFileName factorPlanFileName nFeatures effectsPlanFileName regressionFileName;
+global N mean_arrive mean_service queue_limit device_amount t runsFileName factorPlanFileName nFeatures effectsPlanFileName regressionFileName economicsFileName;
 N = 1000;
 mean_arrive = 20;
 mean_service = 60;
@@ -9,4 +9,5 @@ runsFileName = 'pre_model.xlsx';
 factorPlanFileName = 'factorPlan.xlsx';
 effectsPlanFileName = 'effects.xlsx';
 regressionFileName = 'regression.xlsx';
+economicsFileName = 'economics.xlsx';
 nFeatures = 7;
