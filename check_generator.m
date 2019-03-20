@@ -1,6 +1,6 @@
 %Проверка генератора
 function [] = check_generator(Exp_X, M)
-    xiKvadratFileName = "xiKvadrat.xlsx";
+    xiKvadratFileName = "chiSquare.xlsx";
     N=length(Exp_X);
     
     %Оценка мат.ожидания
@@ -29,8 +29,7 @@ function [] = check_generator(Exp_X, M)
     %Построение графика коэффициента корреляции
     figure;
     plot(1:20, p(1:20), '-mo');
-    
-    
+        
     %Построение доверительного интервала для математического ожидания
     A_MX = MX-1.96*sqrt(DX)/sqrt(N);
     B_MX = MX+1.96*sqrt(DX)/sqrt(N);   
@@ -98,40 +97,53 @@ function [] = check_generator(Exp_X, M)
     Nh = Nh / length(Exp_X);
     summ = sum(Nh);
     fprintf('Площадь гистограммы: %.4f\n', summ);
+  
+    %chi square
+    k = round(1.72 * N ^ (1/3));
+    interval_length = (max(Exp_X) - min(Exp_X)) / k;
+    h = histcounts(Exp_X, min(Exp_X):interval_length:max(Exp_X));
+    an = min(Exp_X);
+    bn = an + interval_length;
+    syms x;
+    initial_distribution = 1 / M * exp(-x / M);
+    partial_p = zeros(1, k);
     
-    %Проверка гипотезы о законе распределения генеральной совокупности
-    %методом xi_kvadrat
+    [status,sheets,xlFormat] = xlsfinfo(xiKvadratFileName);
+    currentSheet = 1;
+    if(length(sheets) == 1)
+        currentSheet = 2;
+    end
     
-    %Вычисление теоретического значения вероятности попадания в интервалы:
-    P_i=exp(-[min(Exp_X):step:max(Exp_X)]/M);
-    p_i=P_i(1:end-1)-P_i(2:end);
+    for i=1:k
+        partial_p(i) = int(initial_distribution, x, [an bn]);
+        an = an + interval_length;
+        bn = bn + interval_length;
+        xlswrite(xiKvadratFileName,an, currentSheet, strcat('A',num2str(i+1)));
+        xlswrite(xiKvadratFileName,bn, currentSheet, strcat('B',num2str(i+1)));
+    end
 
-    %Объединение промежутков
-    p_i(11)=sum(p_i(7:end));
-    p_i=p_i(1:11);
-    
-    N_i(11)=sum(N_i(7:end));
-    N_i=N_i(1:11);
-    ex=(N_i-p_i*N);
-    ex=(N_i-p_i*N).^2./(p_i*N);    
-    
-    headers = ["левая граница", "правая граница", "n_i", "p_i", "xi"];
-    xlswrite(xiKvadratFileName,headers, 1, 'A1:E1');    
-    xlswrite(xiKvadratFileName,transpose(leftInt), 1, 'A2');
-    xlswrite(xiKvadratFileName,transpose(rightInt), 1, 'B2');
-    xlswrite(xiKvadratFileName,transpose(N_i), 1, 'C2');
-    xlswrite(xiKvadratFileName,transpose(p_i), 1, 'D2');
-    xlswrite(xiKvadratFileName,transpose(ex), 1, 'E2');    
- 
-    %Вычисление значения статистики критерия:
-    xi_kvadrat=sum((N_i-p_i*N).^2./(p_i*N));
-    if xi_kvadrat < 7.96
-        fprintf('Хи-квадрат = %g\n', xi_kvadrat);
-        fprintf('Хи-квадрат < 7.96 => Гипотеза о законе распределения генеральной совокупности принимается');
+    Z = 0;
+    z_i = [];
+    for i=1:k
+        z_i(end+1) = (h(i) - partial_p(i) * N) ^ 2 / (partial_p(i) * N);
+        Z = Z + z_i(i);       
+    end
+    disp('Статистика критерия хи-квадрат');
+    disp(Z);
+    alpha = 0.05;
+    degree = k - 2;
+    chi_table = chi2inv(1 - alpha, degree);
+    disp('Табличное значение критерия хи-квадрат');
+    disp(chi_table);
+    if Z <= chi_table
+        disp('Гипотеза о законе распределения генеральной совокупности принимается');
     else
-        fprintf('Хи-квадрат = %g\n', xi_kvadrat);
-        fprintf('Хи-квадрат >= 7.96 => Гипотеза о законе распределения генеральной совокупности отвергается');
-    end    
-    fprintf('\n');
-    fprintf('\n');
+        disp('Гипотеза о законе распределения генеральной совокупности отвергается');
+    end
+    
+    headers = ["левая граница", "правая граница", "h", "p_i", "z_i"];
+    xlswrite(xiKvadratFileName,headers, currentSheet, 'A1:E1');        
+    xlswrite(xiKvadratFileName,transpose(h), currentSheet, 'C2');
+    xlswrite(xiKvadratFileName,transpose(partial_p), currentSheet, 'D2');
+    xlswrite(xiKvadratFileName,transpose(z_i), currentSheet, 'E2');  
 end

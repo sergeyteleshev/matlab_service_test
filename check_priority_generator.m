@@ -21,9 +21,8 @@ function [] = check_priority_generator(Exp_X, N)
     %Подсчет частоты попадания в каждый интервал:
     H_i=N_i/N;
     
-    %Вывод гистограммы и графика плотности распределения
-    
+    %Вывод гистограммы и графика плотности распределения            
     figure;
-    bar(Int(1:(end-1))+step/2, H_i/step);
+    bar(Int(1:(end-1))+step/2, H_i);
     hold on  
 end
