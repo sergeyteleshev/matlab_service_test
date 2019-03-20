@@ -1,6 +1,6 @@
 %ѕроверка генератора
 function [] = check_generator(Exp_X, M)
-
+    xiKvadratFileName = "xiKvadrat.xlsx";
     N=length(Exp_X);
     
     %ќценка мат.ожидани€
@@ -65,6 +65,13 @@ function [] = check_generator(Exp_X, M)
     %–азбиение на интервалы:
     step=(max(Exp_X)-min(Exp_X))/k;
     Int = [min(Exp_X):step:max(Exp_X)];
+    leftInt = [];
+    rightInt = [];
+    
+    for k=1:1:length(Int) - 1
+        leftInt(end+1) = Int(k);
+        rightInt(end+1) = Int(k+1);
+    end
     
     %ѕодсчет количества случайных величин, попавших в каждый из интервалов:
     N_i=zeros(1, k);
@@ -106,7 +113,15 @@ function [] = check_generator(Exp_X, M)
     N_i(11)=sum(N_i(7:end));
     N_i=N_i(1:11);
     ex=(N_i-p_i*N);
-    ex=(N_i-p_i*N).^2./(p_i*N);
+    ex=(N_i-p_i*N).^2./(p_i*N);    
+    
+    headers = ["лева€ граница", "права€ граница", "n_i", "p_i", "xi"];
+    xlswrite(xiKvadratFileName,headers, 1, 'A1:E1');    
+    xlswrite(xiKvadratFileName,transpose(leftInt), 1, 'A2');
+    xlswrite(xiKvadratFileName,transpose(rightInt), 1, 'B2');
+    xlswrite(xiKvadratFileName,transpose(N_i), 1, 'C2');
+    xlswrite(xiKvadratFileName,transpose(p_i), 1, 'D2');
+    xlswrite(xiKvadratFileName,transpose(ex), 1, 'E2');    
  
     %¬ычисление значени€ статистики критери€:
     xi_kvadrat=sum((N_i-p_i*N).^2./(p_i*N));

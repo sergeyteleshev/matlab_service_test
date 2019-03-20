@@ -350,15 +350,15 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     
     %Число требований в очереди   
     Qn=[];    
-    for i=1:1:length(T)
-        Qn(i)=sum(Q_amount(1:i))/i;
-    end
+%     for i=1:1:length(T)
+%         Qn(i)=sum(Q_amount(1:i))/i;
+%     end
             
     %Число требований в системе   
     Sn=[];
-    for i=1:1:length(T)
-       Sn(i)=sum(S_amount(1:i))/i;
-    end
+%     for i=1:1:length(T)
+%        Sn(i)=sum(S_amount(1:i))/i;
+%     end
             
     %Среднее время ожидания заявки в очереди
     for i=1:1:n
@@ -371,8 +371,8 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     end            
     
     global g_Qn g_T g_Sn g_dn g_n g_sn g_p_current visualize;
-    g_Sn = Sn;   
-    g_Qn = Qn;
+    g_Sn = S_amount;   
+    g_Qn = Q_amount;
     g_T = T;    
     g_dn = dn;
     g_n = n;
