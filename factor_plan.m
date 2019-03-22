@@ -1,7 +1,7 @@
 arguments
 global factorPlanFileName device_amount queue_limit mean_service mean_arrive N nFeatures plan;
 runsFileSheet = 1;
-device_amount_dif = 2;
+device_amount_dif = 1;
 queue_limit_dif = 5;
 mean_service_dif = 10;
 statistic = zeros(1, nFeatures);
