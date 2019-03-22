@@ -1,5 +1,5 @@
 arguments
-global factorPlanFileName device_amount queue_limit mean_service mean_arrive N nFeatures;
+global factorPlanFileName device_amount queue_limit mean_service mean_arrive N nFeatures plan;
 runsFileSheet = 1;
 device_amount_dif = 2;
 queue_limit_dif = 5;
@@ -9,19 +9,6 @@ headers = ["p", "Tq", "Ts", "Nq", "Ns", "Ca", "Cr"];
 xlswrite(factorPlanFileName,headers, 1, 'A1:G1');
 
 n = xlsread(runsFileName, runsFileSheet, 'I2');
-%n = 1;
-
-%столбец 1 = девайсы ; столбец 2 = очередь; столбец 3 = время обслуживания
-plan = [
-    '-','-','-' ;
-    '+','-','-' ;
-    '-','+','-' ;
-    '+','+','-' ;
-    '-','-','+' ;
-    '+','-','+' ;
-    '-','+','+' ;
-    '+','+','+' ;
-];
 
 %length(plan(1, :)) %3
 %length(plan(:,1)) %8

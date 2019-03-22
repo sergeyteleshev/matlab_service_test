@@ -1,5 +1,5 @@
 arguments;
-global mean_arrive factorPlanFileName device_amount mean_service N queue_limit regressionFileName economicsFileName;
+global mean_arrive factorPlanFileName device_amount mean_service N queue_limit regressionFileName economicsFileName plan;
 
 device_amount_dif = 2;
 queue_limit_dif = 5;
@@ -18,7 +18,7 @@ x3min = mean_service - mean_service_dif;
 s=[x1min x1max x1min x1max x1min x1max x1min x1max];
 m_A = mean_arrive;
 factorPlanResult = xlsread(factorPlanFileName, 1, "A2:G9");
-a = xlsread(regressionFileName, 1, "A2:G9")
+a = xlsread(regressionFileName, 1, "A2:G9");
 
 EH=0.15;
 
@@ -43,7 +43,7 @@ for i=1:1:length(a(:,1))-1
     y(8,i) = a(1,i) + a(2,i)*x1max + a(3,i)*x2max + a(4,i)*x3max + a(5,i)*x1max*x2max + a(6,i)*x1max*x3max + a(7,i)*x2max*x3max + a(8,i)*x1max*x2max*x3max;
 end
 
-Nq=y(:, 4); 
+Nq=y(:, 4);     
 Ns=y(:, 5);
 Ca=y(:, 6);
 
