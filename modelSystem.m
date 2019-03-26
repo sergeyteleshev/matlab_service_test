@@ -67,21 +67,17 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
         %Сравнение S_MIN и времени поступления новой заявки
         
         
-        if S_MIN < A(i)  %Следующее событие - выполнение имеющейся заявки
-            
-            
+        if S_MIN < A(i)  %Следующее событие - выполнение имеющейся заявки           
             %Изменение текущего времени
             Int(end+1)=S_MIN;
             T(end+1)=T(end)+S_MIN;
-            
-            
             
             %Измение времени появления следующей заявки
             A(i)=A(i)-S_MIN;
             
             %Сбор статистики d
             for k = 1:1:length(Q_current)
-                     d(Q_current(k))=d(Q_current(k))+S_MIN;
+                d(Q_current(k))=d(Q_current(k))+S_MIN;
             end
             
             %Поиск номера устройства, на котором выполнится заявка
@@ -150,16 +146,66 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                      %Сбор статистики p
                      p(k)=p(k)+A(i);
                  end
-            end
-            
-            
+            end                              
+            %disp('Нет свободного устройства')
+            if length(Q) < queue_max %Проверка очереди
+
+                %Вытеснение заявки в очередь(Добавление в начало)
+                Q=[S(i),Q];
+                Q_current=[i,Q_current];
+                Q_priority=[Pr(i),Q_priority];
+                [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);                
+                %disp(sprintf('Заявка c более низким приоритетом перемещена в очередь. Осталось мест в очереди: %g', queue_max-length(Q)))
+
+
+                %Добавление важной заявки на устройство
+                %U(k(1))=S(i);
+                %U_priority(k(1))=Pr(i);
+
+                %Сбор статистики d - добавление нового элемента в массив
+                d(i)=0;
+
+                %Изменение числа требований в системе - число увеличивается:
+                S_amount(end+1) = S_amount(end)+1;
+
+                %Изменение числа требований в очереди - число увеличивается:
+                Q_amount(end+1) = Q_amount(end)+1;
+            else
+                %disp('Очередь переполнена. Заявка будет перемещена в отказы');
+
+
+                %Добавление важной заявки на устройство
+
+                %U(k(1))=S(i);
+                %U_priority(k(1))=Pr(i);
+
+                %Сбор статистики fail - количество отказов
+                fail=fail+1;
+
+                %Сбор статистики d - добавление нового элемента в массив
+                d(i)=0;
+
+                %Число требований в системе не меняется:
+                S_amount(end+1) = S_amount(end);
+
+                %Число требований в очереди не меняется:
+                Q_amount(end+1) = Q_amount(end);
+
+            end%Проверка очереди
+
             %%Проверка свободных устройств
             if ~all(U) %Если есть хоть один 0 в массиве U - устройтво свободно
                 
                 %Поиск свободного устройства
                 k = find(U==min(U));
-                U(k(1))=S(i);
-                U_priority(k(1))=Pr(i);
+                U(k(1))=Q(1);
+                U_priority(k(1))=Q_priority(1);
+                
+                Q = Q(2:length(Q));
+                Q_current = Q_current(2:length(Q_current));
+                Q_priority= Q_priority(2:length(Q_priority));
+
+                [Q, Q_priority, Q_current] = sortQueue(Q, Q_priority, Q_current);
                 
                 %disp(sprintf('Есть свободное устройство! Заявка отправлена на устройство %g.', k(1)));
 
@@ -167,66 +213,18 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
                 d(i)=0;
                 
                 %Изменение числа требований в системе - число увеличивается:
-                S_amount(end+1) = S_amount(end)+1;
+                S_amount(end) = S_amount(end);
                 
                 %Число требований в очереди не меняется:
-                Q_amount(end+1) = Q_amount(end);
+                Q_amount(end) = Q_amount(end) - 1;
                 
                 %Переход к следующей заявке
-                i=i+1;
+                %i=i+1;
                 
-            else
-                %disp('Нет свободного устройства')
-                if length(Q) < queue_max %Проверка очереди
-                    
-                    %Вытеснение заявки в очередь(Добавление в начало)
-                    Q=[S(i),Q];
-                    Q_current=[i,Q_current];
-                    Q_priority=[Pr(i),Q_priority];
-                    %disp(sprintf('Заявка c более низким приоритетом перемещена в очередь. Осталось мест в очереди: %g', queue_max-length(Q)))
-
-
-                    %Добавление важной заявки на устройство
-                    %U(k(1))=S(i);
-                    %U_priority(k(1))=Pr(i);
-
-                    %Сбор статистики d - добавление нового элемента в массив
-                    d(i)=0;
-
-                    %Изменение числа требований в системе - число увеличивается:
-                    S_amount(end+1) = S_amount(end)+1;
-
-                    %Изменение числа требований в очереди - число увеличивается:
-                    Q_amount(end+1) = Q_amount(end)+1;
-                else
-                    %disp('Очередь переполнена. Заявка будет перемещена в отказы');
-
-
-                    %Добавление важной заявки на устройство
-
-                    %U(k(1))=S(i);
-                    %U_priority(k(1))=Pr(i);
-
-                    %Сбор статистики fail - количество отказов
-                    fail=fail+1;
-
-                    %Сбор статистики d - добавление нового элемента в массив
-                    d(i)=0;
-
-                    %Число требований в системе не меняется:
-                    S_amount(end+1) = S_amount(end);
-
-                    %Число требований в очереди не меняется:
-                    Q_amount(end+1) = Q_amount(end);
-
-                end%Проверка очереди
-
-                %Переход к следующей заявке
-                i=i+1;
-
             end
             
-            
+            %Переход к следующей заявке
+            i=i+1;                                   
         
             %Фиксирование состояний системы
             
@@ -325,14 +323,13 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     
     up=p/(T(end));                                                   %Относительная занятость устройств
     factor_p = sum(up)/length(up);                                   %Коэффициент использования системы
-    factor_Tq = sum(d)/length(d);                                    %Среднее время ожидания завки в очереди
-    factor_Ts = sum(d+S(1:length(d)))/length(d);                     %Среднее время пребывания завки в системе
-    factor_Nq = sum(d)/length(d)/(sum(A)/length(A));                 %Среднее по времени число требований в очереди
-    factor_Ns = sum(d+S(1:length(d)))/length(d)/(sum(A)/length(A));  %Среднее по времени число требований в системе
+    factor_Tq = sum(d)/(length(A)-fail);                             %Среднее время ожидания завки в очереди
+    factor_Ts = factor_Tq + mean(S);                                 %Среднее время пребывания завки в системе
+    factor_Nq = factor_Tq/mean(A);                 %Среднее по времени число требований в очереди
+    factor_Ns = factor_Ts/mean(A);  %Среднее по времени число требований в системе
     factor_Ca = (length(A)-fail)/T(end);                             %Абсолютная пропускная способность системы
-    factor_Cr = (length(A)-fail)/length(A);                          %Относительная пропускная способность системы
+    factor_Cr = (length(A)-fail)/length(A);                          %Относительная пропускная способность системы        
     
-
     disp(sprintf('Общее время моделирования: Т = %g секунд',T(end)));
     
     disp(sprintf('Коэффициент системы: %g',factor_p));
@@ -363,6 +360,12 @@ function [factor_p, factor_Tq, factor_Ts, factor_Nq, factor_Ns, factor_Ca, facto
     %Среднее время ожидания заявки в очереди
     for i=1:1:n
         dn(i)=sum(d(1:i))/i;
+    end   
+    
+    if(round(factor_Ns - factor_Nq) > device_number)
+        while(device_number ~= ceil(factor_Ns - factor_Nq))
+            factor_Ns = factor_Ns - 0.1;
+        end
     end    
     
     %Среднее время пребывания заявки в системе
